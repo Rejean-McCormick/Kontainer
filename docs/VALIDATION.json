@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-11",
+  "version": "1.0.0rc1",
+  "platform": "Linux",
+  "python": "3.12.14",
+  "tests_passed": 62,
+  "coverage": {
+    "measured_with_branches": true,
+    "percent": 82.39,
+    "statements": 1206,
+    "covered_lines": 1047,
+    "branches": 486,
+    "covered_branches": 347
+  },
+  "lint": "passed",
+  "format": "passed",
+  "wheel_build": "passed",
+  "sdist_build": "passed",
+  "installed_wheel_smoke": "passed",
+  "native_hardware_tests": "not-performed",
+  "remote_ci": "not-run",
+  "independent_security_audit": "not-performed",
+  "framework_semantic_validation": "not-performed",
+  "dependency_audit": {
+    "tool": "pip-audit 2.10.1",
+    "scope": "5 pinned runtime Python distributions; no dependency resolution",
+    "known_vulnerabilities_found": 0,
+    "independent_code_audit": false
+  }
+}

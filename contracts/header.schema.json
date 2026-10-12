@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:kristal:container:header:1",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "kristal.container/1"
+        },
+        "mode": {
+          "const": "open"
+        }
+      },
+      "required": [
+        "format",
+        "mode"
+      ]
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format": {
+          "const": "kristal.container/1"
+        },
+        "mode": {
+          "const": "encrypted"
+        },
+        "profile": {
+          "const": "xchacha20poly1305-secretstream-v1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 24,
+          "maxLength": 24,
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        },
+        "stream": {
+          "type": "string",
+          "minLength": 32,
+          "maxLength": 32,
+          "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+        },
+        "slots": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "password",
+                      "password-factor"
+                    ]
+                  },
+                  "kdf": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "name": {
+                        "const": "argon2id"
+                      },
+                      "version": {
+                        "const": 19
+                      },
+                      "memory_kib": {
+                        "const": 65536
+                      },
+                      "iterations": {
+                        "const": 3
+                      },
+                      "parallelism": {
+                        "const": 4
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "version",
+                      "memory_kib",
+                      "iterations",
+                      "parallelism"
+                    ]
+                  },
+                  "salt": {
+                    "type": "string",
+                    "minLength": 24,
+                    "maxLength": 24,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  },
+                  "nonce": {
+                    "type": "string",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  },
+                  "wrapped": {
+                    "type": "string",
+                    "minLength": 64,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "kdf",
+                  "salt",
+                  "nonce",
+                  "wrapped"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "const": "recovery"
+                  },
+                  "nonce": {
+                    "type": "string",
+                    "minLength": 32,
+                    "maxLength": 32,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  },
+                  "wrapped": {
+                    "type": "string",
+                    "minLength": 64,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "nonce",
+                  "wrapped"
+                ]
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "type": {
+                    "const": "x25519"
+                  },
+                  "key_id": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "wrapped": {
+                    "type": "string",
+                    "minLength": 128,
+                    "maxLength": 128,
+                    "pattern": "^[A-Za-z0-9+/]+={0,2}$"
+                  }
+                },
+                "required": [
+                  "type",
+                  "key_id",
+                  "wrapped"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "format",
+        "mode",
+        "profile",
+        "id",
+        "stream",
+        "slots"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "python": "3.12.14",
+  "platform": "Linux",
+  "payload_bytes": 67108864,
+  "container_bytes": 67111208,
+  "pack_seconds": 0.449,
+  "verify_seconds": 0.3497,
+  "note": "Synthetic local measurement; not a cross-platform performance guarantee."
+}

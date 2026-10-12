@@ -1,0 +1,6 @@
+include LICENSE README.md CHANGELOG.md SECURITY.md AGENTS.md CONTRIBUTING.md THIRD_PARTY_NOTICES.md constraints.txt
+recursive-include docs *.md *.json
+recursive-include contracts *.json *.md
+recursive-include examples *.md *.json *.kristal
+recursive-include tests *.py
+recursive-include tools *.py

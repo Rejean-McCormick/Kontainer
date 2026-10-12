@@ -1,0 +1,12 @@
+{
+  "format": "kristal.container-verification/1",
+  "integrity": "verified",
+  "file_count": 2,
+  "total_bytes": 308,
+  "manifest_sha256": "8fb6ab200fb44635d83738c894a5bf38f644748ea53c0de074749c70d750de90",
+  "signature": "absent",
+  "signer_id": null,
+  "semantic_validation": "not-performed",
+  "mode": "open",
+  "container_sha256": "f4709e5cc9720b7c4878e0114e7e6ad49298e2d4600bd32d2d769a4079b8eb18"
+}

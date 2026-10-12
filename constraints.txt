@@ -1,0 +1,7 @@
+# Versions runtime exercised in this delivery. These are version constraints,
+# not a cryptographically hash-locked or vulnerability-certified dependency set.
+PyNaCl==1.6.2
+argon2-cffi==25.1.0
+argon2-cffi-bindings==26.1.0
+cffi==2.1.1
+pycparser==3.11
