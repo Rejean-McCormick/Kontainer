@@ -1,60 +1,60 @@
-# Intégration Kristal
+# Kristal integration
 
-## État observé des pièces jointes
+## Observed state of supplied attachments
 
-Le code fourni contient le Framework, l'Authoring Kit et Manager dans `Kristal-Manager(1).zip`. Le Local Kit possède `pack` et `pack-ai` qui emploient `ZIP_DEFLATED`. Sa projection `kristal.github-read-surface/1.0` énumère `path`, `size`, `sha256` préfixé `sha256:`, `ready`, `errors`, compte et volume. Manager consomme cette projection. Konfid ne stocke ni ne vérifie les mots de passe humains.
+The supplied code includes Framework, Authoring Kit and Manager in `Kristal-Manager(1).zip`. Local Kit has `pack` and `pack-ai` commands that use `ZIP_DEFLATED`. Its `kristal.github-read-surface/1.0` projection lists `path`, `size`, `sha256` prefixed with `sha256:`, `ready`, `errors`, count and volume. Manager consumes the projection. Konfid neither stores nor verifies human passwords.
 
-Ce dépôt est ajouté séparément. Aucun de ces dépôts n'est modifié, aucune migration canonique ni synchronisation GitHub n'est effectuée par les outils de ce dépôt.
+This repository is added separately. None of those repositories is modified, and these tools perform no canonical migration or GitHub synchronization.
 
-## Contrats à adopter
+## Contracts to adopt
 
-| Propriétaire | Changement ciblé à intégrer |
+| Owner | Intended integration change |
 |---|---|
-| Framework | Adopter/qualifier `FORMAT.md`, les schémas et vecteurs ; conserver séparation identité/représentation |
-| Authoring Kit | Ajouter un adaptateur d'export utilisant cette bibliothèque après son parcours de validation/build existant |
-| Manager | Ajouter ouverture/protection/récupération, afficher l'état vérifié et empêcher l'export en clair involontaire |
-| Kompiler / lecteurs | Lire via `Container`, appliquer ensuite Reader Policies avant toute vue dérivée |
-| Konfid | Décisions d'accès pour un fournisseur de clés externe, pas traitement des mots de passe locaux |
-| Interaction Kernel | Commandes bornées et reçus, sans assimilation à la validation sémantique |
+| Framework | Adopt/qualify `FORMAT.md`, schemas and vectors; preserve identity/representation separation |
+| Authoring Kit | Add an export adapter that uses this library after its existing validation/build process |
+| Manager | Add opening/protection/recovery, display verified status and prevent inadvertent plaintext export |
+| Kompiler / readers | Read through `Container`, then enforce Reader Policies before any derived view |
+| Konfid | Make access decisions for an external key provider, not process local passwords |
+| Interaction Kernel | Bounded commands and receipts without equating them to semantic validation |
 
-Les schémas du dépôt ne remplacent pas les schémas des State Snapshots. Aucun recalcul des Logical Commitments n'est prétendu ici.
+Repository schemas do not replace State Snapshot schemas. No Framework Logical Commitment recomputation is claimed here.
 
-## Local Kit : adaptateur utilisable
+## Local Kit: usable adapter
 
-Le caller obtient la projection via son interface existante :
+The caller obtains the projection using its existing interface:
 
 ```sh
-python tools/kristal.py read-surface CHEMIN --require-ready --compact
+python tools/kristal.py read-surface PATH --require-ready --compact
 ```
 
-Il passe l'objet décodé à l'adaptateur :
+Pass the decoded object to the adapter:
 
 ```python
 from pathlib import Path
 from kristal_container import Protection
 from kristal_container.integration import pack_read_surface
 
-# projection provient du Local Kit autorisé, obtenu par le caller.
-pack_read_surface(Path("workspace"), Path("lecture.kristal"), projection,
-                  protection=Protection(password=phrase_secrete))
+# projection comes from the authorized Local Kit and is obtained by the caller.
+pack_read_surface(Path("workspace"), Path("read.kristal"), projection,
+                  protection=Protection(password=secret_passphrase))
 ```
 
-L'adaptateur exige `ready=true` et `errors=[]`, reprend **exactement** la liste des fichiers, puis compare tailles/empreintes au snapshot emballé avant publication du résultat. Il ne lance ni build, ni shell, ni réseau. Le caller établit l'origine de la projection ; l'adaptateur ne requalifie pas son `surface_digest` ou sa sémantique.
+The adapter requires `ready=true` and `errors=[]`, uses **exactly** the listed files, and compares sizes/hashes against the packaged snapshot before publishing the result. It runs no build, shell or network operation. The caller establishes projection provenance; the adapter does not requalify its `surface_digest` or semantics.
 
-Les blobs de `materialization_objects` ne sont pas téléchargés. Le fichier représente cette surface sélectionnée ; ce n'est pas une promesse que toutes les références externes du Kristal soient disponibles hors ligne. Pour embarquer d'autres matérialisations autorisées, le propriétaire doit définir explicitement un autre périmètre de paquet.
+`materialization_objects` blobs are not downloaded. The file represents this selected surface, not a guarantee that every external Kristal reference is available offline. To include other authorized materializations, the owner must explicitly define a different package scope.
 
 ## Manager
 
-Afficher séparément : ouvert/chiffré ; signature absente/inconnue/approuvée ; validation physique/validation Framework ; chemin normal/récupération. Ne jamais afficher « vérifié » sur la seule réponse `inspect`.
+Display separately: open/encrypted; signature absent/unknown/trusted; physical/Framework validation; normal/recovery access path. Never display “verified” based only on `inspect`.
 
-Une action de synchronisation d'un fichier chiffré transporte le fichier opaque. Exporter sa surface en clair, même vers un dépôt privé, exige une politique et une action explicites. Les bibliothèques tierces d'aperçu, index, logs, caches et sauvegardes doivent respecter le même périmètre de confidentialité.
+Synchronizing an encrypted file transports opaque bytes. Exporting its plaintext surface, even to a private repository, requires an explicit policy and action. Third-party preview libraries, indexes, logs, caches and backups must respect the same confidentiality scope.
 
-Ne pas publier automatiquement l'identifiant logique confidentiel dans les index de collection. Le repo GitHub d'accueil et sa visibilité ne sont pas une assurance cryptographique.
+Do not automatically publish a confidential logical identifier in collection indexes. The host GitHub repository and its visibility are not a cryptographic guarantee.
 
-## Lecteurs
+## Readers
 
-La bibliothèque n'a pas d'ACL par membre. L'ouverture donne au processus accès à tout le paquet. Si des catégories de lecteurs ont des droits incompatibles, produire des paquets/domaines de clés séparés et conserver les relations sémantiques externes. Un champ JSON de permission n'empêche pas un détenteur de clé d'extraire les octets.
+The library has no per-member ACL. Opening grants the process access to the entire package. If reader categories require incompatible permissions, produce separate packages/key domains and retain external semantic relations. A JSON permission field cannot prevent a keyholder from extracting bytes.
 
-## Vérification bout en bout attendue
+## Expected end-to-end verification
 
-État construit et validé par Local Kit → empaquetage → lecture indépendante → mêmes octets d'état et mêmes références → nouvelle validation Framework avec ses outils existants. Le test de byte equality de ce dépôt n'est pas une recomputation sémantique du Framework.
+State built and validated by Local Kit → packaging → independent read → identical state bytes and references → fresh Framework validation using existing tools. This repository's byte-equality test does not recompute Framework semantics.

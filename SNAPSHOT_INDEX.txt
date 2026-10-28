@@ -1,5 +1,5 @@
 ZmartZnap snapshot file index
-Files included: 60
+Files included: 61
 
 .gitattributes
 .github/dependabot.yml
@@ -7,6 +7,7 @@ Files included: 60
 .gitignore
 AGENTS.md
 CHANGELOG.md
+CONSOLIDATION_SHA256.json
 constraints.txt
 contracts/header.schema.json
 contracts/manifest.schema.json
@@ -16,9 +17,11 @@ docs/API.md
 docs/ARCHITECTURE.md
 docs/BENCHMARK.json
 docs/CHANGE_REPORT.md
+docs/CONSOLIDATION_2026-10-27_FR.md
 docs/DECISIONS.md
 docs/DEPENDENCY_AUDIT.json
 docs/FORMAT.md
+docs/Integration-Verification-2026-10-27.md
 docs/INTEGRATION.md
 docs/PROVIDERS.md
 docs/RECOVERY.md
@@ -32,7 +35,6 @@ examples/demo/README.md
 examples/demo/state/example.json
 examples/open-v1.expected.json
 examples/open-v1.kristal
-GitSink.bat
 LICENSE
 MANIFEST.in
 pyproject.toml
@@ -60,6 +62,5 @@ tests/test_security.py
 THIRD_PARTY_NOTICES.md
 tools/benchmark.py
 tools/check.py
-ZmartZnap.pyw
 
 Index file: SNAPSHOT_INDEX.txt

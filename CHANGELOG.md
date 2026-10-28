@@ -2,6 +2,6 @@
 
 ## 1.0.0rc1 — 2026-10-11
 
-Première livraison autonome : profil STORE/ZIP64, enveloppe versionnée, Argon2id et secretstream, accès mot de passe/facteur/destinataires/récupération, signatures Ed25519 avec confiance externe, temporaires chiffrés, écriture atomique, parser borné, lecture vérifiée, rotation par réemballage, clés privées chiffrées, CLI JSON, adaptateur Local Kit, interfaces explicites de fournisseurs, documentation et tests.
+First standalone release: STORE/ZIP64 profile, versioned envelope, Argon2id and secretstream, password/factor/recipient/recovery access, Ed25519 signatures with external trust, encrypted temporary files, atomic writes, bounded parser, verified reads, rotation through rewrapping, encrypted private keys, JSON CLI, Local Kit adapter, explicit provider interfaces, documentation and tests.
 
-Les fournisseurs natifs matériels/réseau, le postquantique et la récupération à seuil sont absents. Aucune modification automatique de Framework, Manager, Konfid ou des workspaces canoniques.
+Native hardware/network providers, post-quantum cryptography, and threshold recovery are not included. No automatic modification of Framework, Manager, Konfid or canonical workspaces.

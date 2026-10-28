@@ -1,0 +1,126 @@
+{
+  "format": "documentation-translation-report/1.0",
+  "translation_language": "en",
+  "source_archive": "znapshot_Kontainer_10280913.zip",
+  "source_archive_sha256": "9e5a7591c208b4ed95f5a412cd6846736e50ebcbdb0f33a4ac19d5b1afdcc8f1",
+  "software_changed": false,
+  "scope": "main-repository Markdown documentation, excluding bundled vendor dependencies; no code or structured data translation",
+  "translated_paths": [
+    {
+      "path": "AGENTS.md",
+      "original_sha256": "69390f8f59643a301a67c23e810cb170174cd0f359bcba5d1b54b6766c598af8",
+      "english_sha256": "2a5a665fe0fe110c9b663c238a601a37724229323238f97b2d694f9df2b1c7de"
+    },
+    {
+      "path": "CHANGELOG.md",
+      "original_sha256": "fb6724ddea1e44e6eb361a51808ed79f38bc36aea6c49d5569783a008f775eaf",
+      "english_sha256": "d81859ac2351f52f80dd5d26db7090c41c382f49e8f53fe2fd7bb52012c9bbca"
+    },
+    {
+      "path": "contracts/README.md",
+      "original_sha256": "7cb4b7ed1b87c7f7ce1c494e0a8384f5e1133e898c814ec40fe3722436fbe232",
+      "english_sha256": "985ec1341f151492133a57014ad0a904a40eb4fa9018a41ad5ed40937e4acc11"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "original_sha256": "5b17bfefdbf8fbe7a4fe5ed679dc4fe4ce996ce3d6551d47807ff9bcdc1240ac",
+      "english_sha256": "c323f2021d80bd770afce602128bc55a38745e979ba4bb7933d744dbac3a706e"
+    },
+    {
+      "path": "docs/API.md",
+      "original_sha256": "45a8724dcd5d833d426919592fd91bc09baf9fa8738f72818a57bc6285342d44",
+      "english_sha256": "ec1e37a97b3e42dd38d7c007896fa732397875bcddbf540b8dba68a8bf84f8ab"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "original_sha256": "723e2132611d41c105a9dda2bcb6c042279615c63526906163f61c0bc8f5d689",
+      "english_sha256": "5ee6b497de446c8c20a184e90746d8d11c2b32c3b2c5fce357d6495ff16b484f"
+    },
+    {
+      "path": "docs/CHANGE_REPORT.md",
+      "original_sha256": "c68ebebe747f9111fbcdc2c0a959385ab923703f240e932d483e2e808dc0bf25",
+      "english_sha256": "4225076e773138a066343b1c701fa576f9799560a96e8991f10bc53ae254db33"
+    },
+    {
+      "path": "docs/CONSOLIDATION_2026-10-27_FR.md",
+      "original_sha256": "15b6e74078ecaf856ea316f60336198e5af17db2bb6e75a8a0e7735a2957b11f",
+      "english_sha256": "a2c86f101b799fda0e6a5a767a31cd38b9fa7cf2d135a4173a85945edee7c824"
+    },
+    {
+      "path": "docs/DECISIONS.md",
+      "original_sha256": "1a38869ce122e4750e07ed2ade0ecf515921d14ed53dc56b9c1aaade0f6e1684",
+      "english_sha256": "c19e02ef3e1c3864c60b441d4b37e92e19140c03baf6a9cbe578a7378339062e"
+    },
+    {
+      "path": "docs/FORMAT.md",
+      "original_sha256": "25fd45047bec7129dbc0b0a739f3bd640d3309c63fc0c5415e98e68bf28255e1",
+      "english_sha256": "718dcf25590f57fc28de3d0915cddb440e0afc3c8bf19153089cb402643bc7e8"
+    },
+    {
+      "path": "docs/Integration-Verification-2026-10-27.md",
+      "original_sha256": "1e0c07854462d04097841beb058b0a69b11030a4502b1428a6b0d7b0b3b76869",
+      "english_sha256": "2597f53144d8e365f967eefc4019c92a6f5396760eb839abcebc8b8a334e5d7b"
+    },
+    {
+      "path": "docs/INTEGRATION.md",
+      "original_sha256": "9a51c92d1aaa4a31648b8f0c9a51cae92a0238e0d135570986562d1729c1e05d",
+      "english_sha256": "4f7d43b0971daac6ed7dada6f1e245a9b457e63199ca853712ff3d0b7dc33cf5"
+    },
+    {
+      "path": "docs/PROVIDERS.md",
+      "original_sha256": "c17dabde2295efba38c8dc85a91615d2c4c895d78f0278645c5395286ef583f7",
+      "english_sha256": "40004a6af1ef8f59b273902760f6ec3d09c85c1b9ef54046273e9c825612ac86"
+    },
+    {
+      "path": "docs/RECOVERY.md",
+      "original_sha256": "94332502bab08c4150f1e80e256fc404bd3bc6e3beb587128ea0dd1c7ac86a7d",
+      "english_sha256": "191a28a8d0ef8f32de9c874274154f179283a730cb49ec7016322fe93b15d9b6"
+    },
+    {
+      "path": "docs/REFERENCES.md",
+      "original_sha256": "264ec36d40ebeadc1406fea6bce414231272301a1e34af1caf5aab9ccc5ceeb2",
+      "english_sha256": "9f31f7437381f8d6a669bed93c9ebb791f13d767fe06cafdf1f9a10ec19e2315"
+    },
+    {
+      "path": "docs/RELEASE.md",
+      "original_sha256": "5b34952b00012398c6464d2d294c509e0ce4f19411a7d8ba4295bd0c7f5421a3",
+      "english_sha256": "8cda722e33eff5f9d1f49133578d886952a811b8b30bc831cb76efbff9e849b6"
+    },
+    {
+      "path": "docs/THREAT_MODEL.md",
+      "original_sha256": "758ad5107ad72badae99102a40c33204303fc2359b4d0e2f97b2309e99380219",
+      "english_sha256": "47ed77d8d910430db9586eed606882b1d73601fdf4c4e94676d6d2cb7538378a"
+    },
+    {
+      "path": "docs/USAGE.md",
+      "original_sha256": "c61d0cf6dd9960e32d786ace4d88e6d5f8c46fdbcd3c5faa9fccc515f030d58a",
+      "english_sha256": "95f3ff96ed6baecea3a66691c63624e1b09dd7f577a4facdf1811a32b3b98f6c"
+    },
+    {
+      "path": "docs/VALIDATION.md",
+      "original_sha256": "f73fcf8c36d261c0b0cdf962a74e98747cffe4da0af878cf07c473770930fb44",
+      "english_sha256": "582a29d821f597c6c4e5cfd245fff197bef9dc2627f8c19e917bbe9a598381ac"
+    },
+    {
+      "path": "examples/demo/README.md",
+      "original_sha256": "b09147a341bf82be22bded52d3082bf564551c19a5562b8b2fc42f453ffe5bb3",
+      "english_sha256": "47e51fb107f7ee8c3aeeefd8cd6fcc5cfdd4341e25c87af3f719e919457f2bf4"
+    },
+    {
+      "path": "README.md",
+      "original_sha256": "10dee688d4b20886b46208dc685b212b58c1050d727c97f756630585f211e84b",
+      "english_sha256": "fbd3428acd01afe2ca6379d9017911040fd0976aa6619dc4fc7bffa1da06173f"
+    },
+    {
+      "path": "SECURITY.md",
+      "original_sha256": "2bd2615942e04a60d4815191a77f9bd1a333b1d3aec040f177cf38879606ca3b",
+      "english_sha256": "1056fcb4095c30aceaf718f563fc2ca8c07de0833f9f0a63bf5a928267a716f2"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.md",
+      "original_sha256": "1bf28089df78b3305ae264c8777fde8e0490db9bff6ab84474f128e37d1ab5c9",
+      "english_sha256": "cb42166ea6fbc78020322f948c952d123ce9f59e46a6362b8b632d1469affb36"
+    }
+  ],
+  "historical_manifests": "Retained in their historical state where present; consult this translation manifest for modified documents."
+}

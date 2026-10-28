@@ -1,39 +1,39 @@
-# Modèle de menace
+# Threat model
 
-## Garanties et limites
+## Guarantees and limitations
 
-| Adversaire / événement | Contrôle | Limite |
+| Adversary / event | Control | Limitation |
 |---|---|---|
-| Copie d'un fichier chiffré | Clé aléatoire, AEAD, KDF mémoire-dur | Mot de passe faible attaquable hors ligne |
-| Modification/troncature/réordonnancement | Header authentifié, tags par frame, FINAL obligatoire | Un détenteur de la clé peut produire un autre contenu valide |
-| Fichier ouvert malveillant | Parser strict, bornes, manifeste | Un manifeste non signé ne prouve pas l'origine |
-| Origine forgée | Signature et clés de confiance extérieures | Pas de vérité factuelle ni d'autorité sémantique automatique |
-| Archive hostile | STORE uniquement, chemins/tailles/comptages vérifiés | Budget CPU/disque autorisé reste consommable |
-| Fuite des temporaires | Spool chiffré à clé éphémère | RAM/swap/core dumps hors protection |
-| Perte d'un moyen d'accès | Slot récupération indépendant | Sans moyen prévu, aucune récupération magique |
-| Ancienne version réintroduite | `expected_sha256` obtenu d'une source fiable | Le fichier seul ne sait pas quelle version est la plus récente |
-| Poste compromis pendant lecture | Aucun contrôle complet dans ce dépôt | Le plaintext autorisé peut être copié |
-| Appareil perdu | Réemballage, nouvelles clés pour la suite | Les anciennes copies déchiffrables ne sont pas révoquées |
-| Service géré indisponible | Fournisseur qui refuse, aucun fallback implicite | Un slot de secours est un chemin alternatif volontaire |
+| Copy of encrypted file | Random key, AEAD, memory-hard KDF | Weak password susceptible to offline attack |
+| Modification/truncation/reordering | Authenticated header, per-frame tags, mandatory FINAL | A keyholder can produce other valid content |
+| Malicious open file | Strict parser, bounds, manifest | Unsigned manifest cannot prove origin |
+| Forged provenance | Signature and externally trusted keys | No automatic factual truth or semantic authority |
+| Hostile archive | STORE only, validated paths/sizes/counts | Allowed CPU/disk budget can still be exhausted |
+| Temporary-file leakage | Encrypted spool with ephemeral key | RAM/swap/core dumps out of scope |
+| Lost access method | Independent recovery slot | No magic recovery without a configured method |
+| Reintroduction of old version | `expected_sha256` from trusted source | File alone cannot know newest version |
+| Compromised workstation during reading | No comprehensive control in this repo | Authorized plaintext may be copied |
+| Lost device | Rewrap and new keys for future use | Previously decryptable copies are not revoked |
+| Managed service unavailable | Failing provider, no implicit fallback | Recovery slot is an intentional alternative path |
 
-## Actifs
+## Assets
 
-Contenu, noms, métadonnées intérieures, clés de contenu, phrases secrètes, identités privées, facteurs et clés de récupération. Les empreintes logiques confidentielles doivent rester dans la partie chiffrée. Les identifiants de destinataires et la taille du fichier sont des fuites reconnues du profil v1.
+Content, filenames, inner metadata, content keys, passphrases, private identities, factors and recovery keys. Confidential logical fingerprints must remain in the encrypted portion. Recipient IDs and file size are acknowledged leakages in the v1 profile.
 
-## Hors du périmètre
+## Out of scope
 
-DRM inviolable, protection contre root/administrateur, effacement garanti des SSD ou de la RAM Python, invisibilité des tailles, révocation rétroactive de plaintext, horloge fiable hors ligne, preuve de vérité, antivirus complet, sécurité des renderers ou prompt injection après déchiffrement.
+Unbreakable DRM, protection against root/administrators, guaranteed erasure of SSDs or Python memory, hiding file sizes, retroactive revocation of plaintext, a trustworthy offline clock, proof of truth, complete antivirus, renderer safety or prompt injection after decryption.
 
-Un contenu signé reste une entrée non fiable pour HTML, PDF, macros, scripts et modèles IA. Le lecteur ne rend et n'exécute rien. Les ACL/Reader Policies applicatives doivent encore précéder recherche, cache, citations et export.
+Signed content is still untrusted input for HTML, PDFs, macros, scripts and AI models. The reader neither renders nor executes anything. Application ACLs/Reader Policies must still be enforced before search, caching, citation and export.
 
-## Contrôles opérationnels
+## Operational controls
 
-Utiliser une phrase longue et unique ; le minimum de longueur n'est pas un test d'entropie. Protéger le poste et le disque système, réduire les core dumps, protéger le swap et le compte utilisateur. Garder les secrets de récupération et facteurs loin des fichiers concernés. Réduire les limites dans les services exposés et limiter leur concurrence (chaque Argon2 consomme 64 Mio). Ne pas transmettre les objets `Credentials` à un logger.
+Use a long, unique passphrase; a minimum length is not an entropy test. Protect the machine and system disk, limit core dumps, protect swap and user accounts. Keep recovery secrets and factors away from the relevant files. Lower limits on exposed services and limit concurrency (each Argon2 operation consumes 64 MiB). Do not send `Credentials` objects to logging.
 
-Le moteur n'a pas de rate limiter hors ligne : un attaquant peut copier le fichier et modifier le lecteur. Une prétendue limite locale de tentatives serait trompeuse. Les fournisseurs en ligne doivent gérer leurs propres limites et politiques.
+The engine has no offline rate limiter: an attacker may copy the file and modify the reader. A purported local attempt limit would be misleading. Online providers must enforce their own limits and policies.
 
-## Downgrade et authenticité
+## Downgrades and authenticity
 
-L'authentification d'enveloppe protège les modifications sans clé. Un acteur autorisé au déchiffrement peut toutefois distribuer une version ouverte du même contenu signé. Les consommateurs qui exigent la confidentialité doivent fixer `require_encrypted=True` depuis une politique externe. Une signature du manifeste ne signe pas la liste des destinataires.
+Envelope authentication protects against unauthorized changes. However, an actor authorized to decrypt may distribute an open version of the same signed content. Consumers that require confidentiality must enforce `require_encrypted=True` through an external policy. A manifest signature does not sign the recipient list.
 
-Une signature valide avec clé embarquée n'est que `valid-untrusted`. Les clés de confiance doivent être distribuées/authentifiées séparément. Aucun bootstrap automatique de confiance sur première ouverture n'est effectué.
+A valid signature with an embedded key is only `valid-untrusted`. Trusted keys must be authenticated/distributed separately. No automatic trust-on-first-use bootstrapping occurs.

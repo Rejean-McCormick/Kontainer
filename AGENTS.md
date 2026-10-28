@@ -1,12 +1,12 @@
-# Instructions pour contributeurs et agents
+# Instructions for contributors and agents
 
-- Préserver la séparation état logique / représentation physique.
-- Garder les primitives dans les bibliothèques maintenues ; documenter tout protocole ou profil nouveau.
-- Une protection indisponible échoue fermée. Aucun faux TPM, ID système secret, 2FA visuelle ou crypto postquantique d'étiquette.
-- Ne jamais écrire de secrets réels dans ce dépôt ni les logs. Les fixtures binaires publiques ne concernent que des données synthétiques ouvertes.
-- Tous les fichiers importés sont non fiables. Maintenir budgets, canonicalisation, refus des chemins, signatures et vérification complète.
-- Toute modification de sécurité doit avoir un test de menace, pas seulement un test miroir de l'implémentation.
-- Aucune publication, activation, migration ou synchronisation implicite dans les outils.
-- Mettre à jour FORMAT, schémas, vecteurs, capacités et VALIDATION si les garanties changent.
-- Rendre explicite ce qui est testé localement, testé par double, projeté ou non qualifié.
-- Commandes : `python -m pytest`, `python -m ruff check src tests tools`, `python -m ruff format --check src tests tools`, `python -m build`.
+- Maintain separation between logical state and physical representation.
+- Keep cryptographic primitives in maintained libraries; document every new protocol or profile.
+- An unavailable protection must fail closed. No fake TPM, secret system ID, visual 2FA, or misleading post-quantum crypto labels.
+- Never write real secrets to this repository or logs. Public binary fixtures must contain only synthetic open data.
+- All imported files are untrusted. Preserve budgets, canonicalization, path rejections, signatures, and full verification.
+- Every security change needs a threat-focused test, not merely a test that mirrors the implementation.
+- No implicit publication, activation, migration, or synchronization in tools.
+- Update FORMAT, schemas, vectors, capabilities, and VALIDATION when guarantees change.
+- Clearly distinguish locally tested, test-double-tested, projected, and unqualified capabilities.
+- Commands: `python -m pytest`, `python -m ruff check src tests tools`, `python -m ruff format --check src tests tools`, `python -m build`.

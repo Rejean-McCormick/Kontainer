@@ -1,14 +1,14 @@
-# Dépendances tierces
+# Third-party dependencies
 
-Le code source livré ne vendore pas les dépendances ; elles sont installées par le gestionnaire de paquets.
+The delivered source does not vendor dependencies; they are installed by the package manager.
 
-| Composant | Rôle | Licence amont à conserver selon distribution |
+| Component | Role | Upstream license to retain when distributing |
 |---|---|---|
-| PyNaCl | API libsodium | Apache-2.0 |
-| libsodium | Primitives cryptographiques natives | ISC |
-| argon2-cffi | API Argon2 | MIT |
-| argon2-cffi-bindings | Bindings et bibliothèque Argon2 | Consulter les notices MIT / CC0 / Apache dans la distribution |
-| CFFI | Interface native | MIT |
-| pycparser | Parseur support CFFI | BSD |
+| PyNaCl | libsodium API | Apache-2.0 |
+| libsodium | Native cryptographic primitives | ISC |
+| argon2-cffi | Argon2 API | MIT |
+| argon2-cffi-bindings | Bindings and Argon2 library | Consult MIT / CC0 / Apache notices in the distribution |
+| CFFI | Native interface | MIT |
+| pycparser | CFFI support parser | BSD |
 
-Avant de redistribuer des wheels natives, conserver leurs notices exactes et inventorier les composants embarqués. Le tableau est un inventaire technique, pas un avis juridique.
+Before redistributing native wheels, retain their exact notices and inventory included components. This table is a technical inventory, not legal advice.

@@ -1,38 +1,38 @@
-# Fournisseurs externes : frontières et qualification
+# External providers: boundaries and qualification
 
-Les deux interfaces Python sont opérationnelles, couvertes par des doubles de test. **Aucun fournisseur TPM, WebAuthn, KMS ou Konfid de production n'est inclus.** L'absence de matériel/infrastructure qualifiée n'est jamais remplacée par une clé logicielle silencieuse. `capabilities` garde ces intégrations dans `unsupported`.
+Both Python interfaces are functional and covered by test doubles. **No production TPM, WebAuthn, KMS or Konfid provider is included.** Missing qualified hardware/infrastructure is never silently replaced by a software key. `capabilities` keeps these integrations marked `unsupported`.
 
 ## FactorProvider
 
-`derive(container_id: bytes) -> bytes` retourne exactement 32 octets secrets pseudorandom. L'identifiant aléatoire du conteneur a 16 octets, permet de distinguer ses facteurs et doit conduire au même résultat lors des réouvertures. Le résultat est combiné à Argon2id via HKDF ; aucun slot mot de passe simple n'est ajouté.
+`derive(container_id: bytes) -> bytes` returns exactly 32 pseudorandom secret bytes. The random container ID is 16 bytes, distinguishes factors between containers and must lead to the same result on reopening. The result is combined with Argon2id through HKDF; no plain password-only slot is added.
 
-Usage : `Protection(password=..., factor_provider=provider)`, puis `Credentials(password=..., factor_provider=provider)`.
+Usage: `Protection(password=..., factor_provider=provider)`, then `Credentials(password=..., factor_provider=provider)`.
 
-Pour WebAuthn PRF : qualifier une origine/RP ID stable, l'enrôlement, le support PRF réel, la vérification utilisateur, le stockage des identifiants de credential hors enveloppe, la restauration et les conséquences des passkeys synchronisées. Une passkey synchronisée n'est pas une liaison à un unique appareil. Ne jamais utiliser une signature publique comme secret de chiffrement. Un code TOTP n'a pas l'entropie d'un secret de déchiffrement autonome.
+For WebAuthn PRF: qualify a stable origin/RP ID, enrollment, actual PRF support, user verification, credential-ID storage outside the envelope, restoration, and the implications of synchronized passkeys. A synchronized passkey is not bound to a single device. Never use a public signature as an encryption secret. A TOTP code lacks the entropy of an independent decryption secret.
 
-Pour TPM : lier l'accès à une clé protégée par le TPM réel, vérifier l'absence de migration/export requis, traiter mises à jour et réinitialisations, qualifier le chemin de récupération. Tous les TPM ne supportent pas X25519 : le slot destinataire existant ne doit pas être présenté comme un wrapper universel TPM. Un nouveau slot d'encapsulation peut nécessiter une nouvelle version de profil.
+For TPM: bind access to a key protected by the real TPM, verify migration/export requirements, handle updates and resets, and qualify recovery. Not all TPMs support X25519: the existing recipient slot must not be described as a universal TPM wrapper. A new encapsulation slot may need a new profile version.
 
-Le protocole Python n'atteste pas les propriétés d'un fournisseur. C'est une frontière de confiance explicite pour l'application, pas un label de sécurité auto-déclaré par le fichier.
+The Python protocol does not attest provider properties. It is an explicit application trust boundary, not a self-declared security label in the file.
 
 ## RecipientResolver
 
-`unwrap(key_id, container_id, wrapped, header_sha256) -> bytes | None` reçoit une sealed box X25519. Le callback n'est appelé que pour les identifiants présents dans `Credentials.allowed_recipient_ids`, fixés par l'application. Il retourne le plaintext `container_id || content_key` (48 octets), ou None pour une clé non gérée. Les erreurs remontent ; aucun endpoint ou module n'est chargé depuis le fichier.
+`unwrap(key_id, container_id, wrapped, header_sha256) -> bytes | None` receives an X25519 sealed box. The callback is invoked only for IDs listed in application-defined `Credentials.allowed_recipient_ids`. It returns plaintext `container_id || content_key` (48 bytes), or None for an unmanaged key. Errors propagate; the file never loads an endpoint or module.
 
-Un fournisseur géré doit vérifier l'acteur et le workload via son IdP, demander une décision courante et bornée à Konfid/policy runtime, vérifier le scope et les approbations nécessaires, puis faire exécuter le déballage par son service de clés. Les champs de l'en-tête sont des **assertions non authentifiées** jusqu'à la validation du flux ; ils ne peuvent pas être leur propre autorisation.
+A managed provider must authenticate the actor and workload through its IdP, request a current, bounded decision from Konfid/runtime policy, validate scope and required approvals, and have its key service perform unwrapping. Header fields are **unauthenticated claims** until stream verification; they cannot authorize themselves.
 
-Le callback doit imposer délais, budgets, isolation par tenant, journalisation minimale et absence de retour de secrets dans les traces. La clé privée ne doit pas être envoyée au client. Même si seule la clé de contenu revient au client, celui-ci peut la conserver : ne pas promettre de révocation rétroactive.
+The callback must enforce timeouts, budgets, tenant isolation, minimal logging and no leaked secrets in traces. Private keys should not be sent to clients. Even when only the content key is returned, a client can retain it: do not promise retroactive revocation.
 
-Une décision d'autorisation avant livraison de clé ne remplace pas le chiffrement, et un wrapper de récupération qui ouvre sans serveur constitue un bypass **volontaire**, à traiter comme tel dans la politique d'organisation.
+An authorization decision before key delivery does not replace encryption, and a recovery wrapper that opens without a server is a **deliberate** bypass to account for in organizational policy.
 
-## Critères de qualification d'un fournisseur
+## Provider qualification criteria
 
-- Succès réel sur matériel/infrastructure cible et échec sur un autre appareil non autorisé.
-- Échec fermé si facteur, serveur ou preuve d'autorité manque ; aucun fallback implicite.
-- Mot de passe seul insuffisant pour le profil ET.
-- Restauration sur un appareil neuf avec le seul moyen de récupération prévu.
-- Réenrôlement et renouvellement des accès, sans changer les octets de l'état logique.
-- Résistance au rejeu/confusion de tenant dans le parcours serveur.
-- Contrôle des caches, journaux, descripteurs et cycle de vie des secrets.
-- Revue indépendante de l'assemblage et des assurances affichées.
+- Success on real target hardware/infrastructure, failure on another unauthorized device.
+- Fail closed when factor, server or authority evidence is absent; no implicit fallback.
+- Password alone insufficient for the AND profile.
+- Restoration on a new device using only the intended recovery method.
+- Reenrollment and access renewal without changing logical-state bytes.
+- Replay and tenant-confusion resistance in the server workflow.
+- Controls on caches, logs, descriptors and secret lifecycle.
+- Independent review of composition and displayed assurances.
 
-Une simulation qui passe ces interfaces ne suffit pas à cocher les tests matériels.
+Passing a simulation through these interfaces is not sufficient to mark hardware tests complete.

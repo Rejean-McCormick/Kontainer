@@ -1,7 +1,7 @@
-# Contribuer
+# Contributing
 
-Créer un environnement Python isolé et installer `-e ".[dev]"` avec `-c constraints.txt`. Lire AGENTS.md et SECURITY.md. Les changements doivent préciser problème, menace, comportement, compatibilité, tests et limites.
+Create an isolated Python environment and install `-e ".[dev]"` using `-c constraints.txt`. Read AGENTS.md and SECURITY.md. Every change must document the problem, threat, behavior, compatibility, tests and limitations.
 
-Le contrat v1 n'est pas extensible en ignorant des champs inconnus. Préparer les migrations de format explicitement ; ne pas changer silencieusement la signification d'une version. Ajouter un vecteur de conformité et un test adversarial pour les modifications du parser et du protocole.
+The v1 contract cannot be extended by simply ignoring unknown fields. Plan format migrations explicitly; never silently change the meaning of an existing version. Add a conformance vector and adversarial test for parser or protocol changes.
 
-Les noms de version suivent PEP 440. Une release candidate ne devient pas une release de production sur la seule base de tests locaux. Voir docs/RELEASE.md.
+Versions follow PEP 440. A release candidate does not become a production release solely on the basis of local tests. See docs/RELEASE.md.

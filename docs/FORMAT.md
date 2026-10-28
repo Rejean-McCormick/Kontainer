@@ -1,118 +1,118 @@
-# Contrat du fichier `.kristal` — proposition v1
+# `.kristal` file contract — v1 proposal
 
-Statut : profil implémenté dans `Kristal-Container 1.0.0rc1`, à adopter et maintenir normativement dans **Kristal-Framework**. Ce document décrit précisément la lecture v1 ; ajouter une protection nécessite une nouvelle spécification et des tests, jamais un repli silencieux.
+Status: profile implemented in `Kristal-Container 1.0.0rc1`, proposed for normative adoption and maintenance in **Kristal-Framework**. This document precisely specifies v1 reading behavior; adding protection requires a new specification and tests, never a silent fallback.
 
-## 1. Enveloppe
+## 1. Envelope
 
-| Octets | Sens |
+| Bytes | Meaning |
 |---|---|
-| 0..7 | Magic : ASCII `KRISTAL` suivi de `01` hexadécimal |
-| 8..11 | Longueur de l'en-tête JSON, entier non signé 32 bits big-endian |
-| suivants | En-tête UTF-8 canonique, 1 à 65 536 octets |
-| suite | ZIP brut en mode ouvert ; séquence de frames authentifiées en mode chiffré |
+| 0..7 | Magic: ASCII `KRISTAL` followed by hexadecimal `01` |
+| 8..11 | JSON header length, unsigned 32-bit big-endian integer |
+| next | Canonical UTF-8 header, 1 to 65,536 bytes |
+| rest | Raw ZIP in open mode; authenticated frame sequence in encrypted mode |
 
-Le JSON utilise clés triées lexicalement, séparateurs `,` et `:`, aucune espace superflue, UTF-8 sans BOM, `ensure_ascii=False`, aucun NaN/Infinity, aucun membre dupliqué. Les valeurs numériques normatives sont des entiers. Il s'agit d'un sous-ensemble défini ici, **pas d'une revendication de conformité générale RFC 8785/JCS**. Une sérialisation différente est refusée. Les champs non définis sont refusés dans les objets normatifs.
+JSON uses lexically sorted keys, `,` and `:` separators, no unnecessary whitespace, UTF-8 without BOM, `ensure_ascii=False`, no NaN/Infinity and no duplicate members. Normative numeric values are integers. This is a subset defined here, **not a claim of general RFC 8785/JCS conformance**. Alternative serialization is rejected. Undefined fields in normative objects are rejected.
 
-Ouvert : `{"format":"kristal.container/1","mode":"open"}`.
+Open mode: `{"format":"kristal.container/1","mode":"open"}`.
 
-Chiffré : champs exacts `format`, `mode=encrypted`, `profile=xchacha20poly1305-secretstream-v1`, `id` (16 octets aléatoires), `stream` (24 octets de header secretstream), `slots` (1 à 16). Les binaires JSON utilisent Base64 RFC 4648 standard avec padding canonique.
+Encrypted mode: exact fields `format`, `mode=encrypted`, `profile=xchacha20poly1305-secretstream-v1`, `id` (16 random bytes), `stream` (24-byte secretstream header), `slots` (1 to 16). Binary JSON fields use standard RFC 4648 Base64 with canonical padding.
 
-Aucune identité logique ni nom de fichier en clair dans cet en-tête. Restent visibles : mode, algorithmes, types/nombre d'accès, identifiants SHA-256 des clés publiques destinataires et taille totale. Le profil ne fournit pas de padding.
+No logical identity or plaintext filename appears in this header. Visible information includes mode, algorithms, access types/counts, SHA-256 identifiers of recipient public keys, and total size. The profile provides no padding.
 
-## 2. Chiffrement du contenu
+## 2. Content encryption
 
-Une nouvelle clé aléatoire de **32 octets** et un nouveau flux libsodium `crypto_secretstream_xchacha20poly1305` sont générés à chaque création/réemballage chiffré. Les mots de passe ne chiffrent pas directement le contenu.
+A fresh random **32-byte** key and new libsodium `crypto_secretstream_xchacha20poly1305` stream are generated on each encrypted creation/rewrap. Passwords never encrypt content directly.
 
-Chaque frame est précédée de sa longueur non signée 32 bits big-endian. Le plaintext est découpé en blocs de 1 048 576 octets, le dernier bloc de données pouvant être plus court. Chaque frame ajoute 17 octets libsodium. Les tags de données sont `TAG_MESSAGE=0`. Une frame vide avec `TAG_FINAL=3` est **toujours** ajoutée. Sa longueur est 17. Aucun octet ne suit cette frame ; aucun bloc de données ne suit un bloc court.
+Each frame is prefixed by its unsigned 32-bit big-endian length. Plaintext is split into 1,048,576-byte chunks, with a potentially shorter last data chunk. Each frame adds 17 libsodium bytes. Data tags are `TAG_MESSAGE=0`. An empty `TAG_FINAL=3` frame is **always** appended; its length is 17. No bytes follow this frame; no data chunk may follow a short chunk.
 
-Données associées de chaque frame :
-
-```
-ASCII("kristal/stream/v1") || 00 || SHA256(magic || longueur_header_be32 || header_json)
-```
-
-Le header complet, y compris tous les accès aux clés, est donc authentifié par chaque frame. Le lecteur exige la fin authentifiée : des blocs valides partiels ne suffisent pas à accepter le conteneur.
-
-## 3. Slots d'accès
-
-Les slots sont des chemins **OU**. Un seul slot mot de passe (simple ou avec facteur), un seul slot récupération, aucun destinataire répété. Le writer autorise au maximum 14 destinataires, plus mot de passe et récupération. Le CLI est plus restrictif et évite les mélanges involontaires de destinataires et mot de passe ; l'API permet leur combinaison explicite.
-
-### Mot de passe
-
-`type=password`, `kdf`, `salt` (16 octets), `nonce` (24), `wrapped` (48).
-
-KDF exact : `name=argon2id`, `version=19`, `memory_kib=65536`, `iterations=3`, `parallelism=4`, sortie 32 octets. La phrase est encodée UTF-8, sans normalisation ni troncature. Création : 15 à 1024 caractères, au plus 4096 octets. Les variantes de coûts sont refusées avant calcul ; elles nécessiteraient un autre profil.
-
-Dériver `D = Argon2id(password, salt)`, puis `KEK = HKDF-SHA256(D, salt=container_id, info="kristal/password/v1", L=32)`.
-
-Chiffrer la clé de contenu avec XChaCha20-Poly1305, nonce aléatoire, AAD :
+Associated data for each frame:
 
 ```
-ASCII("kristal/keyslot/v1") || 00 || container_id || canonical(slot_sans_wrapped)
+ASCII("kristal/stream/v1") || 00 || SHA256(magic || header_length_be32 || header_json)
 ```
 
-### Mot de passe ET facteur
+The complete header, including all key access slots, is therefore authenticated by each frame. Readers require authenticated finalization: a partial sequence of individually valid chunks is not sufficient to accept a container.
 
-Mêmes champs, `type=password-factor`. Dériver `D` comme ci-dessus, puis `KEK = HKDF-SHA256(D || facteur_32_octets, salt=container_id, info="kristal/password-factor/v1", L=32)`.
+## 3. Access slots
 
-Le facteur provient d'un secret aléatoire ou d'un `FactorProvider` explicitement fourni par l'application. Un simple fichier de secret est copiable et ne prouve pas la présence d'un matériel. Le type ne certifie aucune assurance MFA ; celle-ci appartient au fournisseur qualifié.
+Slots provide **OR** access paths. At most one password slot (plain or with factor), one recovery slot, and no duplicate recipients. The writer allows up to 14 recipients plus password and recovery. The CLI is more restrictive to avoid accidental password/recipient combinations; the API allows explicit combinations.
 
-### Récupération
+### Password
 
-`type=recovery`, `nonce` (24), `wrapped` (48). Secret indépendant aléatoire de 32 octets. `KEK = HKDF-SHA256(secret, salt=container_id, info="kristal/recovery/v1", L=32)`, puis même wrapping AEAD. Le secret n'est jamais enregistré dans le conteneur.
+`type=password`, `kdf`, `salt` (16 bytes), `nonce` (24), `wrapped` (48).
 
-### Destinataire X25519
+Exact KDF: `name=argon2id`, `version=19`, `memory_kib=65536`, `iterations=3`, `parallelism=4`, 32-byte output. Passphrase encoded in UTF-8 with no normalization or truncation. On creation: 15 to 1,024 characters and no more than 4,096 bytes. Alternative cost parameters are rejected before computing; they would require another profile.
 
-`type=x25519`, `key_id=SHA256(public_key_32_octets)` en hexadécimal minuscule, `wrapped` (96 octets).
+Derive `D = Argon2id(password, salt)`, then `KEK = HKDF-SHA256(D, salt=container_id, info="kristal/password/v1", L=32)`.
 
-`wrapped = libsodium SealedBox(public_key, container_id || content_key)`. SealedBox utilise la construction standard libsodium X25519/XSalsa20-Poly1305 ; l'algorithme du slot est donc distinct de celui du flux. Vérifier le container_id après ouverture. Une sealed box n'authentifie pas l'expéditeur : les signatures ont une autre fonction.
+Encrypt the content key using XChaCha20-Poly1305, random nonce, and AAD:
+
+```
+ASCII("kristal/keyslot/v1") || 00 || container_id || canonical(slot_without_wrapped)
+```
+
+### Password AND factor
+
+Same fields with `type=password-factor`. Derive `D` as above, then `KEK = HKDF-SHA256(D || factor_32_bytes, salt=container_id, info="kristal/password-factor/v1", L=32)`.
+
+The factor is a random secret or provided by an application-supplied `FactorProvider`. A plain secret file is copyable and does not prove hardware presence. The type certifies no MFA assurance; that depends on the qualified provider.
+
+### Recovery
+
+`type=recovery`, `nonce` (24), `wrapped` (48). Independent random 32-byte secret. `KEK = HKDF-SHA256(secret, salt=container_id, info="kristal/recovery/v1", L=32)`, then the same AEAD wrapping. The secret is never stored inside the container.
+
+### X25519 recipient
+
+`type=x25519`, `key_id=SHA256(public_key_32_bytes)` in lowercase hexadecimal, `wrapped` (96 bytes).
+
+`wrapped = libsodium SealedBox(public_key, container_id || content_key)`. SealedBox uses standard libsodium X25519/XSalsa20-Poly1305; this slot algorithm is distinct from the stream cipher. Verify `container_id` after opening. A sealed box does not authenticate its sender; signatures serve a different purpose.
 
 ### HKDF
 
-RFC 5869 SHA-256 : `PRK=HMAC(salt, IKM)`, sortie unique `HMAC(PRK, info || 01)` (32 octets). Ne jamais réutiliser les labels entre domaines.
+RFC 5869 SHA-256: `PRK=HMAC(salt, IKM)`, single output `HMAC(PRK, info || 01)` (32 bytes). Never reuse labels between domains.
 
-## 4. ZIP intérieur
+## 4. Inner ZIP
 
-Profil volontairement plus strict qu'un ZIP générique :
+Deliberately stricter than generic ZIP:
 
-- uniquement fichiers réguliers, `STORE`, pas de répertoires explicites ; aucun lien, exécutable automatique ou flux NTFS ;
-- noms relatifs UTF-8 NFC, `/`, au plus 1024 octets ; chaque composant au plus 240 octets ;
-- refus de `..`, `.`, composants vides, antislash, caractères de contrôle/format, `:*?"<>|`, noms réservés Windows et suffixes point/espace ;
-- aucun doublon, alias de casse ou conflit fichier/répertoire ; namespace `_kristal` réservé ;
-- ordre lexicographique des noms utilisateur ; `_kristal/manifest.json` en dernier ;
-- horodatage fixe 1980-01-01 00:00:00 ; système créateur Unix (3), attribut externe `0o100600 << 16` ;
-- en-tête local ZIP64 version 45 pour chaque membre, flag descriptor (8), flag UTF-8 si nécessaire ; CRC local nul, tailles locales `0xffffffff` ;
-- extra local exact : identifiant 1, longueur 16, deux tailles nulles de 64 bits ;
-- descriptor signé `PK\x07\x08`, CRC32, taille compressée et réelle 64 bits little-endian ;
-- aucun trou, préfixe, recouvrement, commentaire ou suffixe ; aucun extra autre que ZIP64 ;
-- central directory et EOCD/ZIP64 EOCD cohérents et bornés avant allocation du parseur.
+- Regular files only, `STORE`, no explicit directories; no links, auto-executables or NTFS streams.
+- Relative UTF-8 NFC names, `/`, maximum 1,024 bytes; each component maximum 240 bytes.
+- Reject `..`, `.`, empty components, backslashes, control/format characters, `:*?"<>|`, Windows reserved names, and trailing dots/spaces.
+- No duplicates, case-folded aliases or file/directory conflicts; `_kristal` namespace reserved.
+- Lexicographic order of user filenames; `_kristal/manifest.json` last.
+- Fixed timestamp 1980-01-01 00:00:00; creator system Unix (3), external attribute `0o100600 << 16`.
+- Local ZIP64 header version 45 for every member, descriptor flag (8), UTF-8 flag when needed; local CRC zero, local sizes `0xffffffff`.
+- Exact local extra: ID 1, length 16, two null 64-bit sizes.
+- Signed descriptor `PK\x07\x08`, CRC32, compressed and actual 64-bit little-endian size.
+- No gaps, prefixes, overlap, comments or suffixes; no extras other than ZIP64.
+- Central directory and EOCD/ZIP64 EOCD must be consistent and bounded before parser allocation.
 
-CRC32 n'est pas une protection cryptographique. Les empreintes SHA-256 du manifeste couvrent les fichiers ; le flux authentifié protège le paquet chiffré. Les archives ZIP ordinaires doivent être converties par `pack` depuis un dossier autorisé, pas acceptées directement.
+CRC32 is not cryptographic protection. SHA-256 hashes in the manifest cover individual files; the authenticated stream protects encrypted packages. Ordinary ZIP archives must be converted by `pack` from an authorized directory rather than accepted directly.
 
-## 5. Manifeste et signature
+## 5. Manifest and signature
 
-Manifeste canonique : `format=kristal.container-manifest/1`, `files=[{path,size,sha256}, ...]`, `signature` optionnelle. Tailles entières positives ou nulles, SHA-256 hexadécimal minuscule. Chaque fichier hors manifeste apparaît exactement une fois ; aucune donnée supplémentaire n'est ignorée.
+Canonical manifest: `format=kristal.container-manifest/1`, `files=[{path,size,sha256}, ...]`, optional `signature`. Sizes are nonnegative integers, SHA-256 lowercase hexadecimal. Each non-manifest file appears exactly once; extra data is never ignored.
 
-Signature : champs exacts `algorithm=ed25519`, `public_key` (32 octets), `value` (64 octets).
+Signature exact fields: `algorithm=ed25519`, `public_key` (32 bytes), `value` (64 bytes).
 
 ```
 signature = Ed25519.sign(
-  ASCII("kristal/container-manifest/1") || 00 || canonical(manifeste_sans_signature)
+  ASCII("kristal/container-manifest/1") || 00 || canonical(manifest_without_signature)
 )
 ```
 
-La clé embarquée permet de vérifier la cohérence cryptographique ; elle n'établit **pas** sa propre confiance. L'application fournit ses clés de confiance hors du fichier. `require_signature=True` sans clé de confiance refuse tout fichier. Fournir des clés de confiance implique une signature correspondante obligatoire.
+The embedded key verifies cryptographic consistency but **cannot establish its own trust**. The application supplies trusted keys out-of-band. `require_signature=True` without any trusted key rejects every file. Providing trusted keys means a corresponding signature is mandatory.
 
-La signature engage les chemins, tailles et contenus via leurs empreintes, pas la politique d'ouverture, le ZIP physique exact ni un Logical Commitment du Framework. Une politique locale `require_encrypted` et une autorisation de distribution restent nécessaires. Une clé de signature approuvée n'est pas une autorisation d'exécuter le contenu.
+The signature covers paths, sizes and contents via hashes, not the opening policy, exact physical ZIP or Framework Logical Commitment. A local `require_encrypted` policy and separate distribution authorization remain necessary. A trusted signing key does not authorize execution of the content.
 
-## 6. Limites par défaut
+## 6. Default limits
 
-10 000 fichiers, 8 Gio par fichier, 16 Gio de contenu, manifeste 8 Mio, central directory 16 Mio, lecture directe `read()` 16 Mio. Le calcul des temporaires ajoute un budget de structure borné. `copy_to()` traite les gros fichiers par blocs. L'API `Limits` peut modifier ces limites positives ; augmenter une limite augmente le budget de ressources accordé à un import hostile.
+10,000 files, 8 GiB per file, 16 GiB total content, 8 MiB manifest, 16 MiB central directory, and 16 MiB direct `read()`. Temporary-space calculation includes bounded structural overhead. `copy_to()` handles large files in chunks. The `Limits` API can adjust these positive ceilings; increasing them increases the resources granted to a hostile import.
 
-## 7. Fichiers de clés
+## 7. Key files
 
-Format canonique `kristal.key/1`. `kind` distingue `identity`, `signing`, `recipient`, `verify`, `recovery`, `factor`. Matériel brut 32 octets.
+Canonical `kristal.key/1` format. `kind` distinguishes `identity`, `signing`, `recipient`, `verify`, `recovery`, and `factor`. Raw key material is 32 bytes.
 
-Les clés privées identité/signature sont obligatoirement chiffrées sur disque : même Argon2id, puis `_password_key` avec l'identifiant de domaine fixe `b"kristal-key-v1\x00\x00"`, XChaCha20-Poly1305, AAD `b"kristal/keyfile/v1\x00" || canonical(objet_sans_encrypted)`. Champs : format, kind, kdf, salt, nonce, encrypted. Les secrets de secours/facteur et clés publiques utilisent `data` Base64 ; les premiers doivent être stockés séparément et protégés.
+Identity/signing private keys must be encrypted on disk: same Argon2id, then `_password_key` with fixed domain identifier `b"kristal-key-v1\x00\x00"`, XChaCha20-Poly1305, AAD `b"kristal/keyfile/v1\x00" || canonical(object_without_encrypted)`. Fields: format, kind, kdf, salt, nonce, encrypted. Recovery/factor secrets and public keys use Base64 `data`; the former must be stored separately and protected.
 
-La confidentialité d'un fichier de clés ne garantit pas une clé matérielle non exportable.
+Confidentiality of a key file does not guarantee a hardware non-exportable key.

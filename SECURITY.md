@@ -1,27 +1,27 @@
-# Sécurité
+# Security
 
-Ce dépôt traite des secrets. Lire `docs/THREAT_MODEL.md`, `docs/FORMAT.md` et `docs/VALIDATION.md` avant de lui confier des données sensibles de production.
+This repository handles secrets. Read `docs/THREAT_MODEL.md`, `docs/FORMAT.md`, and `docs/VALIDATION.md` before entrusting it with sensitive production data.
 
-## État
+## Status
 
-Implémentation candidate, tests locaux effectués, **pas d'audit indépendant**. Aucun claim FIPS, certification MFA/AAL, compatibilité age, qualification TPM ou garantie postquantique. Les capacités absentes ne sont pas activées automatiquement.
+Candidate implementation, locally tested, **no independent audit**. No FIPS claim, MFA/AAL certification, age compatibility, TPM qualification, or post-quantum guarantees. Unavailable capabilities are not silently enabled.
 
-## Signalement
+## Reporting
 
-Ne pas publier de clés, mots de passe, données privées ou preuve d'exploitation contenant ces éléments dans une issue publique. Transmettre au propriétaire du dépôt par un canal privé déjà établi. Aucun faux contact de sécurité ou adresse inexistante n'est fourni ; le propriétaire doit configurer le canal avant publication publique.
+Do not post keys, passwords, private data, or exploit evidence containing them in a public issue. Contact the repository owner through a previously established private channel. No fictitious security contact or nonexistent address is given; the owner must configure the channel before public release.
 
-## Changements exigeant une revue de sécurité
+## Changes requiring security review
 
-- Format, signature, key slots, KDF, AAD, nonces et framing.
-- Parser ZIP, chemins, limites, canonicalisation et allocation mémoire.
-- Fournisseurs matériels ou réseau, identité et autorisation.
-- Récupération, export en clair, cache, temporaires et journalisation.
-- Dépendances crypto, packaging, CI et distribution.
+- Format, signatures, key slots, KDF, AAD, nonces and framing.
+- ZIP parser, paths, limits, canonicalization and memory allocation.
+- Hardware/network providers, identity and authorization.
+- Recovery, plaintext exports, caches, temporary files and logging.
+- Cryptographic dependencies, packaging, CI and distribution.
 
 ## Invariants
 
-Ne pas supprimer une vérification pour faire passer un test. Aucun downgrade silencieux. Aucun secret dans les arguments/logs. Aucun import ou exécutable choisi par le contenu. Aucun octet métier exposé avant vérification requise. Aucun fichier existant écrasé sans option explicite. Aucun secret réel dans les fixtures ou archives de livraison.
+Never remove a check merely to pass a test. No silent downgrades. No secrets in arguments/logs. No import or executable selected by content. No business-data bytes exposed before required verification. No existing file overwritten without an explicit option. No real secrets in fixtures or release archives.
 
 ## Maintenance
 
-Revoir les avis de vulnérabilité des versions Python, PyNaCl/libsodium, argon2-cffi et de leurs bindings. Mettre à jour les contraintes par changement revu et rejouer les tests. Une dépendance figée n'est pas une preuve d'absence de vulnérabilité.
+Review security advisories for Python, PyNaCl/libsodium, argon2-cffi, and their bindings. Update constraints through reviewed changes and rerun tests. A pinned dependency is not proof that vulnerabilities are absent.

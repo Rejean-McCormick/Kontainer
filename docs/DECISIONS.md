@@ -1,37 +1,37 @@
-# Décisions d'architecture
+# Architecture decisions
 
-## ADR-001 — Moteur dans un dépôt séparé
+## ADR-001 — Engine in a separate repository
 
-Un seul moteur réutilisable par Authoring Kit, Manager et lecteurs. Le Framework possède le format ; le dépôt possède son implémentation. Éviter les copies de code de chiffrement et conserver des tests de sécurité indépendants. Aucun service obligatoire.
+One reusable engine for Authoring Kit, Manager and readers. Framework owns the format; this repository owns its implementation. Avoid duplicate cryptographic code and maintain independent security tests. No mandatory service.
 
-## ADR-002 — STORE et enveloppe authentifiée
+## ADR-002 — STORE and authenticated envelope
 
-ZIP64 STORE intérieur pour regrouper sans compresser. L'enveloppe extérieure chiffrée protège aussi les noms. Refus du chiffrement ZIP historique et du simple contrôle de mot de passe en interface. Le format extérieur n'est pas un ZIP directement ouvrable par 7-Zip, même en mode ouvert : l'extension désigne une enveloppe Kristal versionnée.
+Inner ZIP64 STORE groups files without compression. The encrypted outer envelope also hides names. Reject legacy ZIP encryption and UI-only password checks. The outer format is not directly openable by 7-Zip, even in open mode: the extension denotes a versioned Kristal envelope.
 
-## ADR-003 — Bibliothèques éprouvées, protocole explicite
+## ADR-003 — Proven libraries, explicit protocol
 
-libsodium via PyNaCl pour secretstream, AEAD, sealed boxes et Ed25519 ; argon2-cffi pour le profil Argon2id exact du RFC 9106. Les primitives ne sont pas réimplémentées. Le raccord HKDF-SHA256 court suit RFC 5869 et a un test connu. L'assemblage applicatif reste nouveau et nécessite sa propre revue ; utiliser libsodium ne constitue pas un audit du conteneur.
+libsodium via PyNaCl for secretstream, AEAD, sealed boxes and Ed25519; argon2-cffi for the exact RFC 9106 Argon2id profile. Primitives are not reimplemented. The short HKDF-SHA256 bridge follows RFC 5869 and has a known-answer test. Application-level composition is still new and needs its own review; using libsodium is not an audit of the container.
 
-Le format `age` a été considéré. Son profil standard mot de passe utilise scrypt et ne permet pas de le mélanger librement avec d'autres stanzas. Les besoins ET, récupération, profils Kristal et bornes applicatives imposeraient des extensions. Le dépôt ne prétend donc pas être compatible `age`, ne modifie pas sa spécification et documente honnêtement le coût de revue de son enveloppe propre.
+The `age` format was considered. Its standard password profile uses scrypt and cannot freely mix it with other stanzas. AND-factor requirements, recovery, Kristal profiles and application limits would require extensions. This repository does not claim `age` compatibility or change its specification; it documents the review cost of its own envelope honestly.
 
-## ADR-004 — Slots OU ; facteur ET à l'intérieur d'un slot
+## ADR-004 — OR slots; AND factor within a slot
 
-Mot de passe + facteur doivent tous deux participer à la dérivation cryptographique. Une entrée distincte accessible par mot de passe seul annulerait cette propriété. La récupération est intentionnellement un chemin alternatif ; son existence est affichée par `inspect`, sans révéler son secret.
+Password and factor must both participate in cryptographic derivation. A separate password-only entry would negate that property. Recovery is intentionally an alternative path; `inspect` displays its existence without revealing its secret.
 
-## ADR-005 — Pas de faux verrou matériel
+## ADR-005 — No fake hardware lock
 
-Pas de MAC, identifiant système, numéro de disque ou TPM simulé comme promesse de liaison matérielle. Interfaces de fournisseurs explicites, qualification sur matériel réel avant activation. Le fichier ne charge aucun plugin ni commande lui-même.
+No MAC address, system ID, disk serial or simulated TPM presented as hardware binding. Explicit provider interfaces, qualification on real hardware before enabling. The file itself loads no plugin or command.
 
-## ADR-006 — Validation totale et temporaires chiffrés
+## ADR-006 — Full validation and encrypted temporary files
 
-Aucun aperçu ni nom privé avant validation complète. Un spool chiffré répond au besoin d'accès aléatoire du parseur ZIP sans créer une copie complète en clair. Coût assumé : première lecture linéaire ; un index partiellement déchiffrable sera un autre profil si les usages le justifient.
+No private preview or filenames before full verification. An encrypted spool provides ZIP parser random access without creating a complete plaintext disk copy. Accepted cost: linear initial read; a partially decryptable index would be a separate profile if warranted.
 
-## ADR-007 — Sources immuables et écriture transactionnelle
+## ADR-007 — Immutable sources and transactional writes
 
-Pas d'édition en place. Les sources restent intactes. Nouvelle clé à chaque réemballage. Publication du fichier préparé par primitive atomique ; pas de migration, suppression, sync ou activation implicite.
+No in-place editing. Sources remain intact. Fresh key on every rewrap. Publish prepared files through an atomic primitive; no implicit migration, deletion, sync or activation.
 
-## ADR-008 — Postquantique et blockchain
+## ADR-008 — Post-quantum and blockchain
 
-ML-KEM est une piste normalisée pertinente pour des secrets de longue durée. Il n'est pas activé par une simple étiquette. Un futur profil hybride devra protéger aussi les accès de récupération et être qualifié avec une bibliothèque maintenue et des vecteurs indépendants. Aucun slot inconnu n'est ignoré.
+ML-KEM is a relevant standardized direction for long-lived secrets. It is not enabled by adding a label. A future hybrid profile must also protect recovery access and be qualified using maintained libraries and independent vectors. Unknown slots are never ignored.
 
-La blockchain n'aide pas les menaces principales : copie, perte de clés, fuite locale. Signature et audit indépendant appartiennent à des couches distinctes. Aucun réseau de consensus ni dépendance blockchain n'est ajouté.
+Blockchain does not address the main threats: copying, lost keys and local leaks. Signatures and independent audits belong to separate layers. No consensus network or blockchain dependency is added.

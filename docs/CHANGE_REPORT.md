@@ -1,29 +1,29 @@
-# Rapport de livraison
+# Delivery report
 
-## Dépôt
+## Repository
 
-Nouveau dépôt autonome `Kristal-Container`, version 1.0.0rc1. Bibliothèque Python, CLI, documentation française, schémas, tests, outils de vérification, CI, vecteur de conformité et paquet installable.
+New standalone `Kristal-Container` repository, version 1.0.0rc1. Includes a Python library, CLI, English-language documentation (translated in this edition), schemas, tests, verification tools, CI, conformance vectors and installable package.
 
-## Fichiers et responsabilités
+## Files and responsibilities
 
-- `src/kristal_container/` : implémentation du moteur, clés, parser, stockage et API.
-- `tests/` : cas fonctionnels/adversariaux/génératifs, contrat Local Kit et fournisseurs.
-- `contracts/` et `docs/FORMAT.md` : proposition de contrat à adopter par Framework.
-- `docs/` : utilisation, API, architecture, récupération, menaces, providers, décisions, références et preuves.
-- `.github/` : tests multiplateformes et mises à jour proposées de dépendances, sans publication.
-- `examples/` : uniquement données synthétiques et conteneur ouvert vérifiable.
-- `tools/` : gates locales et benchmark opt-in.
+- `src/kristal_container/`: engine implementation, keys, parser, storage, and API.
+- `tests/`: functional, adversarial and generative tests; Local Kit contract and providers.
+- `contracts/` and `docs/FORMAT.md`: contract proposal for adoption by Framework.
+- `docs/`: usage, API, architecture, recovery, threats, providers, decisions, references and evidence.
+- `.github/`: multi-platform tests and proposed dependency updates, without publication.
+- `examples/`: only synthetic data and a verifiable open container.
+- `tools/`: local gates and opt-in benchmark.
 
-Aucun fichier des archives sources n'est modifié. Aucun workspace canonique, dépôt externe, compte, serveur ou appareil n'est activé/configuré.
+No source archive file is modified by the original software delivery. No canonical workspace, external repository, account, server or device is activated or configured.
 
-## Contrats nouveaux
+## New contracts
 
-`kristal.container/1`, `kristal.container-manifest/1`, `kristal.key/1`, rapports de vérification/capacités et interfaces Python de fournisseurs. Le seul contrat existant consommé est la projection `kristal.github-read-surface/1.0`. Aucun contrat sémantique n'est redéfini.
+`kristal.container/1`, `kristal.container-manifest/1`, `kristal.key/1`, verification/capability reports and Python provider interfaces. The only existing contract consumed is the `kristal.github-read-surface/1.0` projection. No semantic contract is redefined.
 
-## Retour arrière
+## Rollback
 
-La création normale écrit un nouveau fichier et laisse le dossier source intact. Le paquet logiciel peut être retiré de son environnement virtuel. Un overwrite explicitement demandé nécessite une sauvegarde antérieure pour retrouver cette version. La suppression du logiciel n'efface pas les secrets/fichiers conservés par le propriétaire.
+Normal creation writes a new file and leaves the source folder intact. The software package can be removed from its virtual environment. An explicitly requested overwrite requires a previous backup to recover that version. Removing the software does not delete secrets/files kept by the owner.
 
-## À intégrer séparément
+## Integrate separately
 
-Adoption du contrat par Framework ; commandes d'export Authoring Kit ; dialogues Manager ; API de lecture Kompiler/Konstellation ; fournisseurs matériel/organisation selon le profil de déploiement. Aucun de ces changements inter-dépôts n'est prétendu déjà installé.
+Framework adoption of the contract; Authoring Kit export commands; Manager dialogs; Kompiler/Konstellation reader APIs; hardware/organizational providers for the chosen deployment profile. None of these cross-repository changes is claimed to have been installed.

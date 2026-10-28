@@ -1,54 +1,54 @@
-# Architecture et performances
+# Architecture and performance
 
-## Propriété des responsabilités
+## Separation of responsibilities
 
-Le Framework conserve les contrats et la sémantique. Ce dépôt implémente un profil physique. Le Local Kit construit les états ; Manager orchestre l'expérience et le transport ; les lecteurs consomment les octets autorisés. Konfid décide des droits dans les parcours gérés. Aucun de ces rôles n'est fusionné ici.
+Framework owns contracts and semantics. This repository implements a physical profile. Local Kit builds states; Manager orchestrates the experience and transport; readers consume authorized bytes. Konfid decides permissions in managed workflows. None of those roles is merged here.
 
-| Module | Responsabilité |
+| Module | Responsibility |
 |---|---|
-| `api.py` | Transactions de paquet, lecture vérifiée, extraction explicite, réemballage |
-| `archive.py` | Sélection, ZIP64 strict, manifeste, signatures |
-| `crypto.py` | Enveloppe, slots, KDF, AEAD et secretstream |
-| `staging.py` | Stockage temporaire chiffré, accès aléatoire en lecture |
-| `filesystem.py` | Fichiers réguliers, refus des liens, publication atomique |
-| `keys.py` | Clés typées, chiffrement des clés privées |
-| `integration.py` | Projection Local Kit, sans duplication du moteur sémantique |
-| `providers.py` | Interfaces de fournisseurs injectés par l'application |
-| `cli.py` | Arguments sûrs et résultats JSON |
+| `api.py` | Package transactions, verified reads, explicit extraction, rewrapping |
+| `archive.py` | Selection, strict ZIP64, manifest, signatures |
+| `crypto.py` | Envelope, slots, KDF, AEAD and secretstream |
+| `staging.py` | Encrypted temporary storage, random-access reading |
+| `filesystem.py` | Regular files, link rejection, atomic publication |
+| `keys.py` | Typed keys, private-key encryption |
+| `integration.py` | Local Kit projection without duplicating the semantic engine |
+| `providers.py` | Application-injected provider interfaces |
+| `cli.py` | Safe arguments and JSON results |
 
-## Écriture
+## Writing
 
-Inventorier → lire les fichiers par blocs → ZIP STORE dans le temporaire chiffré → vérifier structure et empreintes → envelopper → fsync du nouveau fichier → publier atomiquement.
+Inventory → read files in chunks → ZIP STORE in encrypted temporary storage → verify structure and hashes → wrap → fsync new file → publish atomically.
 
-La création refuse une destination dans la source. Elle ne supprime ni ne modifie les sources. Elle vérifie leur identité et métadonnées avant/après lecture et compare l'inventaire final. Une source modifiée concurremment doit être stabilisée ou issue d'un snapshot système ; cette vérification ne remplace pas un snapshot de filesystem face à un adversaire local actif.
+Creation rejects destinations inside the source. It neither deletes nor modifies source files. It checks source identity/metadata before and after reading, and compares the final inventory. A concurrently modified source must be stabilized or captured by an OS snapshot; these checks do not replace a filesystem snapshot against an active local attacker.
 
-Le mode ouvert est déterministe pour les mêmes chemins/octets et la même signature. Les fichiers chiffrés sont volontairement différents à chaque écriture. Le `rewrap` conserve exactement le ZIP intérieur, ses signatures et les états sémantiques qu'il transporte.
+Open mode is deterministic for identical paths/bytes and signature. Encrypted files deliberately differ with each write. `rewrap` preserves the exact inner ZIP, its signatures and any carried semantic states.
 
-## Lecture
+## Reading
 
-Copier/déchiffrer vers le spool chiffré → vérifier fin authentifiée → précontrôler le central directory → vérifier tous les membres et le manifeste → vérifier la politique de signature → exposer une vue en lecture seule.
+Copy/decrypt to encrypted spool → verify authenticated finalization → precheck central directory → verify all members and manifest → verify signature policy → expose read-only view.
 
-Le fichier source peut ensuite être fermé : le lecteur consulte son snapshot privé, pas une nouvelle lecture du chemin initial. `inspect` lit seulement des assertions publiques non authentifiées et le signale explicitement.
+The source file can then close: the reader uses its private snapshot, not a second read from the original path. `inspect` reads only unauthenticated public claims and explicitly labels them as such.
 
-## Temporaires
+## Temporary storage
 
-`EncryptedSpool` écrit des blocs de 1 Mio avec XChaCha20-Poly1305, clé aléatoire éphémère 32 octets, nonce `random16 || index_be64`, AAD de domaine et index. Chaque bloc n'est écrit qu'une fois. Le dernier est court. Position et taille attendues viennent de la mémoire de confiance. Le stockage chiffré permet les seeks nécessaires au ZIP sans déverser de plaintext sur disque.
+`EncryptedSpool` writes 1 MiB chunks using XChaCha20-Poly1305, a random ephemeral 32-byte key, nonce `random16 || index_be64`, and domain/index AAD. Each chunk is written once. The last may be short. Expected position and size come from trusted memory. Encrypted storage supports the seeks required by ZIP without dumping plaintext to disk.
 
-Un bloc déchiffré est mis en cache ; la RAM dépend principalement de quelques blocs, du manifeste et des métadonnées ZIP, plus **64 Mio** pendant Argon2id. Python et les bibliothèques produisent des copies mémoire ; aucun effacement garanti des secrets n'est revendiqué. Le fichier temporaire est supprimé/fermé normalement, mais peut rester chiffré après panne.
+One decrypted chunk is cached; RAM use is largely limited to a few chunks, manifest and ZIP metadata, plus **64 MiB** during Argon2id. Python and libraries make memory copies; no guaranteed secret erasure is claimed. Temporary files are normally closed/deleted but may remain encrypted after a crash.
 
-## Coût et choix assumés
+## Costs and deliberate trade-offs
 
-- Création : plusieurs passes locales de lecture/vérification ; coût O(taille totale), pas chargement complet en RAM.
-- Ouverture : vérification complète O(taille totale), avant la première donnée ; ensuite accès aux membres depuis le spool.
-- Réemballage : nouvelle clé de contenu, nouveau chiffrement intégral. Pas de rotation d'en-tête seule fragile.
-- STORE : aucune compression, économie de CPU et absence de bombes de décompression acceptées ; petite expansion de structure et d'authentification.
-- Pas de modification en place ; chaque résultat est un nouveau snapshot.
-- Pas de promesse de millisecondes pour des centaines de Gio. Un futur profil d'accès partiel chiffré nécessite une conception distincte et une revue de sécurité.
+- Creation: several local read/verification passes, O(total size), without loading everything into RAM.
+- Opening: full O(total size) verification before first data; member access afterward through the spool.
+- Rewrapping: fresh content key and complete re-encryption, not fragile header-only rotation.
+- STORE: no compression, saving CPU and avoiding decompression bombs; modest structural/authentication overhead.
+- No in-place modification; each result is a new snapshot.
+- No millisecond guarantees for hundreds of GiB. A future encrypted partial-access profile would require a separate design and security review.
 
-## Atomicité et OS
+## Atomicity and OS
 
-Les fichiers sont préparés dans le parent de destination, fsync avant publication. Sans overwrite, la publication utilise un hardlink atomique qui échoue si la cible existe. Les filesystems sans hardlinks ne bénéficient pas d'un fallback racy : l'opération échoue. `--overwrite` utilise `os.replace`. Le parent est fsync sur POSIX.
+Files are prepared in the destination's parent directory and fsynced before publication. Without overwrite, publication uses an atomic hardlink that fails if the target exists. Filesystems without hardlinks do not get a racy fallback: the operation fails. `--overwrite` uses `os.replace`. The parent directory is fsynced on POSIX.
 
-Les parents de sources/destinations doivent appartenir à une zone de confiance. Refus des symlinks et reparse points connus, mais aucune protection absolue contre un administrateur ou un processus du même utilisateur qui remplace des répertoires en course.
+Source/destination parent directories must be trusted. Known symlinks and reparse points are rejected, but there is no absolute protection against an administrator or same-user process racing to replace directories.
 
-L'extraction est un export explicite en clair dans un **nouveau** répertoire. Elle nettoie sur erreur ordinaire, mais une interruption brutale peut laisser des fichiers partiels. Elle n'est pas une transaction de répertoire atomique. Sous Windows, modes POSIX 0600/0700 ne remplacent pas une DACL : configurer un profil utilisateur/volume protégé.
+Extraction is an explicit plaintext export into a **new** directory. It cleans up after ordinary errors, but a forced interruption can leave partial files. Extraction is not an atomic directory transaction. On Windows, POSIX modes 0600/0700 are not a substitute for a DACL: use a protected user/volume configuration.

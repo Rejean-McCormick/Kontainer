@@ -1,30 +1,30 @@
-# Qualification et diffusion
+# Qualification and release
 
-## Vérifications de la livraison
+## Delivery checks
 
-1. Environnement isolé, contraintes runtime, tests et lint.
-2. Build wheel + sdist ; installation de la wheel et parcours CLI avec données synthétiques.
-3. Vérification des schémas/vecteurs et absence de secrets réels dans l'archive.
-4. Rapport VALIDATION daté qui distingue résultats observés et étapes non exécutées.
-5. Archive source et empreintes SHA-256. Une empreinte fournie avec le paquet ne remplace pas une signature de diffusion par une identité de confiance.
+1. Isolated environment, runtime constraints, tests and lint.
+2. Wheel + sdist build; install wheel and exercise CLI with synthetic data.
+3. Schema/vector verification and absence of real secrets in the archive.
+4. Dated VALIDATION report distinguishing observed results from steps not executed.
+5. Source archive and SHA-256 hashes. A hash shipped with the package is not a distribution signature from a trusted identity.
 
-## Avant production sensible
+## Before sensitive production
 
-- Revue cryptographique indépendante de l'enveloppe et de la composition des accès.
-- CI réellement exécutée sur les versions Python et OS supportés, notamment Windows/NTFS et ses ACL.
-- Tests de gros volumes/ZIP64 sur les volumes cibles, interruption du processus et saturation disque.
-- Vérification des dépendances/CVE à la date de diffusion ; génération d'un lock avec hashes adapté aux plateformes et d'un SBOM complet si distribution binaire.
-- Adoption explicite du contrat par Framework et tests interop indépendants.
-- Exercice de récupération avec les vrais détenteurs et moyens de secours.
-- Pour un fournisseur matériel/géré, qualification spécifique de PROVIDERS.md.
-- Choix de licence et canal privé de signalement par le propriétaire avant diffusion publique.
+- Independent cryptographic review of the envelope and access-method composition.
+- CI actually run across supported Python/OS versions, especially Windows/NTFS and ACLs.
+- Large-volume/ZIP64 tests on target storage, process interruption and disk exhaustion.
+- Dependency/CVE review at release time; platform-appropriate hash-locked dependencies and a complete SBOM for binary distribution.
+- Explicit Framework adoption of the contract and independent interoperability tests.
+- Recovery exercise with actual custodians and fallback procedures.
+- Provider-specific qualification under PROVIDERS.md for hardware/managed providers.
+- Owner-selected license and private security reporting channel before public distribution.
 
-Les workflows CI ne publient aucun package ni fichier de production. La création d'un dépôt GitHub, le push, les releases et l'activation restent des opérations distinctes.
+CI workflows do not publish any package or production file. GitHub repository creation, pushes, releases and activation are separate operations.
 
-## Versions et migration
+## Versions and migration
 
-La release candidate fige un candidat de format v1 pour revue. Tout changement incompatible avant adoption doit être signalé et disposer d'un outil explicite de conversion avec vérification. Une migration ne doit pas remplacer silencieusement des fichiers existants ou perdre des moyens de récupération.
+The release candidate freezes a proposed v1 format for review. Incompatible changes before adoption must be declared and accompanied by an explicit, verified conversion tool. A migration must never silently replace existing files or lose recovery mechanisms.
 
-## Retour arrière
+## Rollback
 
-Le moteur écrit de nouveaux fichiers et ne modifie pas les sources par défaut. Revenir à l'ancienne version du logiciel et aux copies antérieures validées. Après un `--overwrite` explicite, la restauration dépend de la sauvegarde du propriétaire : l'atomicité n'est pas une sauvegarde historique.
+By default the engine writes new files and leaves sources unchanged. Roll back to the previous software version and earlier validated copies. After explicit `--overwrite`, restoration depends on the owner's backup: atomicity is not version history.

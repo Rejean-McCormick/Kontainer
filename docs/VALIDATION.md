@@ -1,45 +1,45 @@
-# Validation de la livraison
+# Release validation
 
-Date : **11 octobre 2026**. Version : **1.0.0rc1**. Plateforme réellement exécutée : Linux x86-64, Python 3.12.14.
+Date: **October 11, 2026**. Version: **1.0.0rc1**. Actual execution platform: Linux x86-64, Python 3.12.14.
 
-## Résultats observés
+## Observed results
 
-| Vérification | Résultat |
+| Check | Result |
 |---|---|
-| Tests unitaires, fonctionnels et adversariaux | **62 réussis** |
-| Tests génératifs Hypothesis | Inclus : entrées arbitraires bornées, seeks du spool, canonicalisation |
-| Mesure coverage avec branches | **82 %**, détail machine dans VALIDATION.json |
-| Recherche d’avis de vulnérabilité runtime (`pip-audit 2.10.1`) | Aucun avis connu trouvé pour les 5 distributions figées |
-| Ruff lint | Réussi |
-| Ruff format | Réussi |
-| Build wheel et sdist | Réussi |
-| Installation de la wheel dans un environnement virtuel distinct | Réussie |
-| Parcours CLI du paquet installé | Création libre/chiffrée, vérification, récupération, réemballage et extraction réussis |
-| Schémas JSON Schema et vecteur ouvert figé | Réussis |
-| Traitement de 64 Mio synthétiques | Réussi ; mesures dans BENCHMARK.json |
+| Unit, functional and adversarial tests | **62 passed** |
+| Hypothesis property-based tests | Included: bounded arbitrary inputs, spool seeks, canonicalization |
+| Branch coverage measurement | **82%**, machine-readable details in VALIDATION.json |
+| Runtime vulnerability-advisory search (`pip-audit 2.10.1`) | No known advisories found for the five pinned distributions |
+| Ruff lint | Passed |
+| Ruff format | Passed |
+| Wheel and sdist build | Passed |
+| Wheel installation into separate virtual environment | Passed |
+| Installed-package CLI workflow | Successful open/encrypted creation, verification, recovery, rewrapping and extraction |
+| JSON Schemas and pinned open vector | Passed |
+| Processing of 64 MiB synthetic data | Passed; measurements in BENCHMARK.json |
 
-La mesure de couverture n'est pas une preuve de sécurité. Les sorties numériques proviennent des commandes exécutées, pas d'une CI distante annoncée comme réussie.
+Coverage is not proof of security. Numeric results come from executed local commands, not remote CI claimed to have passed.
 
-## Menaces effectivement testées
+## Threats actually tested
 
-Mot de passe absent/erroné ; nécessité conjointe du facteur ; récupération indépendante ; destinataire non autorisé ; signature inconnue/forgée ; politique de chiffrement ; empreinte physique attendue ; altération du header authentifié ; suppression/réordonnancement/duplication/troncature de frames ; suffixes ; paramètres KDF excessifs rejetés avant dérivation ; JSON dupliqué ; chemin absolu/traversée/ADS/noms Windows/collisions ; source liée ; secrets par noms ; fichiers non déclarés ; compression étrangère ; faux comptage du central directory ; ZIP64 avant le sentinel classique ; limites de taille ; échec d'écriture sans corruption de la cible ; contenu du temporaire chiffré ; projection Local Kit périmée ; allowlist avant callback de fournisseur.
+Missing/incorrect password; joint factor requirement; independent recovery; unauthorized recipient; unknown/forged signature; encryption policy; expected physical fingerprint; authenticated-header tampering; deleted/reordered/duplicated/truncated frames; suffixes; excessive KDF parameters rejected before derivation; duplicate JSON; absolute/traversal/ADS/Windows filenames and collisions; linked source; secrets encoded in filenames; undeclared files; unexpected compression; forged central-directory count; ZIP64 before traditional sentinel; size limits; write failure without corrupting target; encrypted temporary contents; stale Local Kit projection; allowlist before provider callback.
 
-## Preuves d'intégration et leurs limites
+## Integration evidence and limitations
 
-`pack_read_surface` est testé sur une projection synthétique conforme aux champs observés dans le Local Kit fourni. Cela prouve son contrôle des octets sélectionnés, pas un parcours graphique Manager ni une recomputation des State Commitments du Framework.
+`pack_read_surface` is tested with a synthetic projection matching fields observed in the supplied Local Kit. This proves checks over selected bytes, not a graphical Manager workflow or recomputation of Framework State Commitments.
 
-Les interfaces FactorProvider et RecipientResolver passent des tests avec doubles logiciels. Aucun test de TPM physique, présence utilisateur WebAuthn, passkey synchronisée, KMS ou Konfid déployé n'a été exécuté. Ces fournisseurs sont annoncés non supportés par le CLI.
+FactorProvider and RecipientResolver interfaces pass tests with software doubles. No physical TPM, WebAuthn user-presence, synchronized passkey, KMS or deployed Konfid test has been run. CLI reports these providers as unsupported.
 
-La CI fournie cible Linux, Windows, macOS et Python 3.11–3.14. Elle n'a pas été exécutée sur GitHub dans cette livraison. Les tests ZIP64 abaissent un seuil pour vérifier les structures ; un conteneur réel de plusieurs Gio n'a pas été qualifié ici. Le test de 64 Mio ne constitue pas une promesse de performance universelle.
+The supplied CI targets Linux, Windows, macOS and Python 3.11–3.14. It was not run on GitHub for this release. ZIP64 tests lower a threshold to verify structures; an actual multi-GiB container was not qualified. The 64 MiB test is not a universal performance promise.
 
-## Benchmark local
+## Local benchmark
 
-64 Mio de données aléatoires synthétiques, sans compression : environ **0,45 s** de création et **0,35 s** d'ouverture/vérification sur cet environnement. Taille du conteneur : **67 111 208 octets** pour **67 108 864 octets** de payload. Les performances de disque, CPU, OS, antivirus et taille du manifeste changent ces résultats.
+64 MiB of random synthetic data, no compression: approximately **0.45 s** to create and **0.35 s** to open/verify in this environment. Container size: **67,111,208 bytes** for **67,108,864 payload bytes**. Disk, CPU, OS, antivirus and manifest size affect results.
 
-## Statut de sécurité
+## Security status
 
-Pas d'audit indépendant, certification ou homologation. Ce dépôt constitue une implémentation candidate utilisable pour intégration et revue ; il ne doit pas être renommé « certifié » ou « production critique qualifiée » sur la seule base de ces tests. Voir RELEASE.md pour les gates restantes.
+No independent audit, certification or accreditation. This repository is a candidate implementation for integration and review; these tests alone do not justify calling it “certified” or “qualified for critical production.” See RELEASE.md for outstanding gates.
 
-## Dépendances
+## Dependencies
 
-`DEPENDENCY_AUDIT.json` contient la recherche datée des avis connus pour PyNaCl, argon2-cffi, argon2-cffi-bindings, CFFI et pycparser, aux versions de `constraints.txt`. Cette recherche ne constitue ni un audit du code ni une analyse exhaustive des bibliothèques natives embarquées ou du système Python. Les versions de développement ne font pas partie de cette recherche.
+`DEPENDENCY_AUDIT.json` contains the dated known-advisory search for PyNaCl, argon2-cffi, argon2-cffi-bindings, CFFI and pycparser at versions in `constraints.txt`. That search is neither a code audit nor a comprehensive review of bundled native libraries or the Python system. Development dependency versions were not included.

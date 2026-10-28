@@ -1,3 +1,3 @@
-# Démonstration synthétique
+# Synthetic demonstration
 
-Ce dossier sert uniquement aux tests et au parcours rapide. Le JSON ci-dessous est une donnée de démonstration ; il ne prétend pas être un State Snapshot conforme au Framework.
+This directory is for tests and quick-start examples only. The JSON below is demo data; it does not claim to be a Framework-conformant State Snapshot.
