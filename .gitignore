@@ -15,3 +15,5 @@ dist/
 .env.*
 *.tmp
 pytest-of-root/
+ZmartZnap.pyw
+GitSink.bat
