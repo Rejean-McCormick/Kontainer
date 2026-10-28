@@ -144,3 +144,8 @@ Les contraintes figent les versions runtime qualifiées, pas les outils de déve
 Le manifeste signe des **octets physiques**. Il ne crée ni Logical Commitment, ni autorité épistémique, ni preuve de vérité. L'empaquetage ne publie, n'active et ne synchronise rien. Les sources sont conservées ; les autres dépôts ne sont pas modifiés par cette livraison.
 
 La licence n'est pas choisie à la place du propriétaire : voir [LICENSE](LICENSE). Le code est livré pour son utilisation et ses modifications ; aucune licence open source n'est implicitement accordée aux tiers.
+
+## Vérification des intégrations satellites (27 octobre 2026)
+
+Voir [le contrôle de compatibilité et les limites de qualification](docs/Integration-Verification-2026-10-27.md). Les versions et statuts externes doivent être vérifiés avant tout déploiement.
+
