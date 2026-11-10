@@ -148,3 +148,5 @@ The license is not chosen on behalf of the owner: see [LICENSE](LICENSE). The co
 ## Satellite integration verification (October 27, 2026)
 
 See [compatibility checks and qualification limits](docs/Integration-Verification-2026-10-27.md). External versions and statuses must be verified before any deployment.
+
+> **Final-system Branch 03 alignment (2026-11-09):** See [the release/distribution/exploration integration note](docs/FINAL_SYSTEM_BRANCH03.md). The seven-owner pipeline is a target with independently gated qualification, permission, packaging and readers. This source snapshot does not authorize public publication or deployment.

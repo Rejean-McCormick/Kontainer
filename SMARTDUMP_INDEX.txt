@@ -1,0 +1,77 @@
+SMART DUMPER INDEX
+==================
+generated_at: 2026-11-09T16:31:21.116511
+source_root: C:\mycode\Kristal\Kontainer
+mode: snapshot
+zip_file: Kontainer_Code_snapshot.zip
+embedded_index: SMARTDUMP_INDEX.txt
+file_count: 64
+total_bytes: 192039
+compression: ZIP_DEFLATED level 1
+
+FILES
+-----
+.gitattributes	119 bytes
+.github/dependabot.yml	257 bytes
+.github/workflows/ci.yml	908 bytes
+.gitignore	192 bytes
+AGENTS.md	1096 bytes
+CHANGELOG.md	614 bytes
+CONSOLIDATION_SHA256.json	6822 bytes
+constraints.txt	250 bytes
+contracts/header.schema.json	5011 bytes
+contracts/manifest.schema.json	1484 bytes
+contracts/README.md	554 bytes
+CONTRIBUTING.md	618 bytes
+docs/API.md	3543 bytes
+docs/ARCHITECTURE.md	4344 bytes
+docs/BENCHMARK.json	248 bytes
+docs/CHANGE_REPORT.md	1918 bytes
+docs/CONSOLIDATION_2026-10-27_FR.md	3771 bytes
+docs/DECISIONS.md	3013 bytes
+docs/DEPENDENCY_AUDIT.json	318 bytes
+docs/FORMAT.md	8306 bytes
+docs/Integration-Verification-2026-10-27.md	1446 bytes
+docs/INTEGRATION.md	3846 bytes
+docs/PROVIDERS.md	3494 bytes
+docs/RECOVERY.md	2595 bytes
+docs/REFERENCES.md	1787 bytes
+docs/RELEASE.md	1923 bytes
+docs/THREAT_MODEL.md	3271 bytes
+docs/USAGE.md	5309 bytes
+docs/VALIDATION.json	818 bytes
+docs/VALIDATION.md	3506 bytes
+examples/demo/README.md	178 bytes
+examples/demo/state/example.json	96 bytes
+examples/open-v1.expected.json	404 bytes
+examples/open-v1.kristal	1121 bytes
+LICENSE	369 bytes
+MANIFEST.in	298 bytes
+pyproject.toml	1183 bytes
+README.md	6656 bytes
+SECURITY.md	1638 bytes
+SNAPSHOT_INDEX.txt	1490 bytes
+src/kristal_container/__init__.py	633 bytes
+src/kristal_container/__main__.py	48 bytes
+src/kristal_container/api.py	7460 bytes
+src/kristal_container/archive.py	16371 bytes
+src/kristal_container/cli.py	12140 bytes
+src/kristal_container/common.py	5612 bytes
+src/kristal_container/crypto.py	14721 bytes
+src/kristal_container/errors.py	540 bytes
+src/kristal_container/filesystem.py	2736 bytes
+src/kristal_container/integration.py	2456 bytes
+src/kristal_container/keys.py	3515 bytes
+src/kristal_container/providers.py	1570 bytes
+src/kristal_container/staging.py	4276 bytes
+tests/conftest.py	384 bytes
+tests/test_contracts.py	1632 bytes
+tests/test_integration.py	5008 bytes
+tests/test_properties.py	2025 bytes
+tests/test_roundtrip.py	7238 bytes
+tests/test_security.py	9120 bytes
+THIRD_PARTY_NOTICES.md	677 bytes
+tools/benchmark.py	1637 bytes
+tools/check.py	449 bytes
+TRANSLATION_MANIFEST_EN.json	5925 bytes
+TRANSLATION_NOTES_EN.md	1052 bytes
