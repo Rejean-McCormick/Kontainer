@@ -80,10 +80,11 @@ def inventory(root: Path, selected: tuple[str, ...] | None, allow_sensitive: boo
         path_set.add(relative)
         if not allow_sensitive:
             reject_sensitive(relative)
-        path = reject_links(root / relative)
-        st = path.stat()
-        if not stat.S_ISREG(st.st_mode):
-            raise PolicyError("Selected path must be a regular file")
+        path = root / relative
+        # Use the same handle-level timestamp representation for all
+        # comparisons. Windows path-level and handle-level stat can differ.
+        with regular_input(path) as source:
+            st = os.fstat(source.fileno())
         if st.st_size > limits.max_file_bytes:
             raise LimitError("Source file exceeds policy")
         total += st.st_size
